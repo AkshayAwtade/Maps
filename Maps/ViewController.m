@@ -19,9 +19,58 @@
     location=[[CLLocationManager alloc]init];
     [location setDesiredAccuracy:kCLLocationAccuracyBest];
     [location requestWhenInUseAuthorization];
-    self.map.showsUserLocation=YES;
-
+    [location startUpdatingLocation];
+//    [location sta]
+//    self.map.showsUserLocation=YES;
+    UILongPressGestureRecognizer *longPressRecognizer =[[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(handeLongPress:)];
+    longPressRecognizer.minimumPressDuration=1.0;
+    [self.map addGestureRecognizer:longPressRecognizer];
     // Do any additional setup after loading the view, typically from a nib.
+}
+-(void)handeLongPress: (UIGestureRecognizer *)gesture{
+    if(gesture.state==UIGestureRecognizerStateBegan)
+    {
+        CGPoint point =[gesture locationInView:gesture.view];
+        CLLocationCoordinate2D coordinates =[self.map convertPoint:point toCoordinateFromView:gesture.view];
+    MKPointAnnotation *mapAnnotion =[[MKPointAnnotation alloc]init];
+    [self.map addAnnotation:mapAnnotion];
+    
+        CLGeocoder *geocoder=[[CLGeocoder alloc]init];
+        CLLocation *annotationCoordinates =[[CLLocation alloc]initWithLatitude:coordinates.latitude longitude:coordinates.longitude];
+        [geocoder reverseGeocodeLocation:annotationCoordinates completionHandler:^(NSArray<CLPlacemark *> * _Nullable placemarks, NSError * _Nullable error) {
+            if(error != nil)
+            {
+                NSLog(@"%@",error.localizedDescription);
+                return ;
+            }
+            if(placemarks.count>0)
+            {
+                CLPlacemark *placeMark =placemarks.firstObject;
+                
+                NSString *title;
+                if(placeMark.thoroughfare !=nil)
+                {
+                    if(placeMark.subThoroughfare !=nil)
+                    {
+                        title =[placeMark.thoroughfare stringByAppendingString:placeMark.subThoroughfare];
+                    }
+                    else{
+                        title = placeMark.thoroughfare;
+                    }
+                }
+                NSString *subtitle =placeMark.locality;
+                mapAnnotion.title =title;
+                ;
+                mapAnnotion.subtitle=subtitle;
+            }
+            else
+            {
+                mapAnnotion.title=@"Unknown place";
+                
+            }
+            [self.map addAnnotation:mapAnnotion];
+        }];
+    }
 }
 
 - (void)didReceiveMemoryWarning {
@@ -61,4 +110,13 @@ else
 
         
         }
+
+
+-(void) mapView:(MKMapView *)mapView didUpdateUserLocation:(MKUserLocation *)userLocation
+{
+    CLLocationCoordinate2D locationUpdate=userLocation.coordinate;
+    MKCoordinateSpan span =MKCoordinateSpanMake(0.1, 0.1);
+    MKCoordinateRegion region =MKCoordinateRegionMake(locationUpdate, span);
+    [mapView setRegion:region animated:YES];
+}
 @end
