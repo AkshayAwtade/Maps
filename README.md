@@ -1,2 +1,2 @@
 MAPS Application
-One can add annotations in the map
+This a objective C program in which one can view standard, Hybrid and satellite map view
