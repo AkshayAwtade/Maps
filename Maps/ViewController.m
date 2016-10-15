@@ -20,20 +20,17 @@
     [location setDesiredAccuracy:kCLLocationAccuracyBest];
     [location requestWhenInUseAuthorization];
     [location startUpdatingLocation];
-//    [location sta]
-//    self.map.showsUserLocation=YES;
     UILongPressGestureRecognizer *longPressRecognizer =[[UILongPressGestureRecognizer alloc]initWithTarget:self action:@selector(handeLongPress:)];
     longPressRecognizer.minimumPressDuration=1.0;
     [self.map addGestureRecognizer:longPressRecognizer];
-    // Do any additional setup after loading the view, typically from a nib.
-}
+   }
 -(void)handeLongPress: (UIGestureRecognizer *)gesture{
     if(gesture.state==UIGestureRecognizerStateBegan)
     {
         CGPoint point =[gesture locationInView:gesture.view];
         CLLocationCoordinate2D coordinates =[self.map convertPoint:point toCoordinateFromView:gesture.view];
     MKPointAnnotation *mapAnnotion =[[MKPointAnnotation alloc]init];
-    [self.map addAnnotation:mapAnnotion];
+//    [self.map addAnnotation:mapAnnotion];
     
         CLGeocoder *geocoder=[[CLGeocoder alloc]init];
         CLLocation *annotationCoordinates =[[CLLocation alloc]initWithLatitude:coordinates.latitude longitude:coordinates.longitude];
@@ -69,13 +66,15 @@
                 
             }
             [self.map addAnnotation:mapAnnotion];
+            
+            NSLog(@"%@ ,,,%@",mapAnnotion.title,mapAnnotion.subtitle);
         }];
     }
 }
 
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
-    // Dispose of any resources that can be recreated.
+
 }
 
 
